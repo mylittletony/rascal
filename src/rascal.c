@@ -225,7 +225,8 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
 
   if (!array_contains(buf, client_mac)) {
 
-    printf("Adding this mac: %s to buffer\n", client_mac);
+    if (verbose)
+      printf("Adding this mac: %s to buffer\n", client_mac);
     strcat(buf, client_mac);
 
     obj2 = json_object_new_object();
@@ -273,7 +274,8 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
 
   if ((arraylen >= MAC_CACHE_LEN && count > 60) || (arraylen > 0 && count >= 240)) {
     memset(buf, 0, sizeof buf);
-    printf ("The json object created: %s\n",json_object_to_json_string(array));
+    if (verbose)
+      printf ("The json object created: %s\n",json_object_to_json_string(array));
     send_data(array);
     json_object_put(array);
     count = 1;
