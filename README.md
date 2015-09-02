@@ -22,6 +22,8 @@ It will collect the data and send to the URL of your choice.
 
 Run it on some linuxy thing with...
 
-```rascal```
+```
+rascal
+```
 
 If you're feeling fancy, run it with -v.
