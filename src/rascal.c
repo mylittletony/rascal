@@ -1,5 +1,5 @@
 /*
- *  Packet Filter, Mainly For OpenWrt
+ *  Rascal Packet Filter, Mainly For OpenWrt
  *  Copyright (C) Cucumber Tony Limited
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -56,7 +56,6 @@
 
 #define MAC_CACHE_LEN 30
 #define MESSAGE_BUFF_LEN 600 /* 18 LEN OF MAC * 20, MAX CACHE */
-/* #define BUZZ_SIZE 1024 /1* For the config file *1/ */
 
 // Only for the ethernet tests //
 
@@ -116,8 +115,8 @@ char ap_mac[19];
 char ap_mac[19];
 double lng;
 double lat;
-char *secret;
-char *token;
+const char *secret;
+const char *token;
 
 static const struct radiotap_align_size align_size_000000_00[] = {
   [0] = { .align = 1, .size = 4, },
