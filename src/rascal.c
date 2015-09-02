@@ -485,21 +485,19 @@ int readconfig() {
             }
             break;
           case json_type_string:
-            if (strcmp(key,"url") == 0) {
+            if (strcmp(key,"rs_url") == 0) {
               strcpy(post_url, json_object_get_string(val0));
             }
             if (strcmp(key,"mac") == 0) {
               strcpy(ap_mac, json_object_get_string(val0));
             }
-            if (strcmp(key,"iface") == 0) {
+            if (strcmp(key,"rs_iface") == 0) {
               strcpy(if_name, json_object_get_string(val0));
             }
-            if (strcmp(key,"secret") == 0) {
-              /* secret = json_object_get_string(val0); */
+            if (strcmp(key,"rs_secret") == 0) {
               strcpy(secret, json_object_get_string(val0));
             }
-            if (strcmp(key,"token") == 0) {
-              /* token = json_object_get_string(val0); */
+            if (strcmp(key,"rs_token") == 0) {
               strcpy(token, json_object_get_string(val0));
             }
             break;
