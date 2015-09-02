@@ -115,8 +115,8 @@ char ap_mac[19];
 char ap_mac[19];
 double lng;
 double lat;
-const char *secret;
-const char *token;
+char secret[];
+char token[];
 
 static const struct radiotap_align_size align_size_000000_00[] = {
   [0] = { .align = 1, .size = 4, },
@@ -509,10 +509,12 @@ int readconfig() {
               strcpy(if_name, json_object_get_string(val0));
             }
             if (strcmp(key,"secret") == 0) {
-              secret = json_object_get_string(val0);
+              /* secret = json_object_get_string(val0); */
+              strcpy(secret, json_object_get_string(val0));
             }
             if (strcmp(key,"token") == 0) {
-              token = json_object_get_string(val0);
+              /* token = json_object_get_string(val0); */
+              strcpy(token, json_object_get_string(val0));
             }
             break;
         }
