@@ -18,4 +18,12 @@ Create a config.json file in /etc/config.json with something like this:
 
 It will collect the data and send to the URL of your choice.
 
-This is most certainly not production ready.
+**This is most certainly not production ready**.
+
+Run it on some linuxy thing with...
+
+```
+rascal
+```
+
+If you're feeling fancy, run it with -v.
