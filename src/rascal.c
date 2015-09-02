@@ -108,7 +108,7 @@ void send_data(json_object *data);
 // End only for the ethernet tests //
 
 static uint8_t verbose = 0;
-const char *config_file = NULL;
+char *config_file = NULL;
 char post_url[255];
 char if_name[10];
 char ap_mac[19];
@@ -453,11 +453,13 @@ char * read_json_file(char *file)
 
 int readconfig() {
 
-  if (config_file == NULL) {
-    config_file = "/tmp/config.json";
-  };
+  config_file = "/etc/config.json";
 
-  char * fp = read_json_file("/tmp/config.json");
+  /* if (config_file == NULL) { */
+  /*   config_file = "/etc/config.json"; */
+  /* }; */
+
+  char * fp = read_json_file(config_file);
 
   if ( fp != NULL )
   {
