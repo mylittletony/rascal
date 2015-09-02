@@ -6,13 +6,13 @@ Create a config.json file in /etc/config.json with something like this:
 
 ```
 {
-    "url": "http://www.wowzers/com/oh-my.json",
     "mac": "my-mac",
-    "iface": "mon0",
     "lat": 54.23412312312,
     "lng": -0.937123967a6,
-    "secret": "oh-top-secret",
-    "token": "oh-optional-token"
+    "rs_url": "http://www.wowzers/com/oh-my.json",
+    "rs_iface": "mon0",
+    "rs_secret": "oh-top-secret",
+    "rs_token": "oh-optional-token"
 }
 ```
 
