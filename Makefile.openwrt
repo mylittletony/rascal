@@ -1,0 +1,51 @@
+COMMIT=333ffa8a4a3d88dd2767cd035324e9adc8e80318
+include $(TOPDIR)/rules.mk
+PKG_NAME:=rascal
+PKG_SOURCE_PROTO:=git
+PKG_SOURCE_VERSION:=$(COMMIT)
+PKG_SOURCE_SUBDIR:=$(PKG_NAME)
+PKG_SOURCE_URL:=https://$(GIT_USERNAME):$(GIT_AUTH_TOKEN)@github.com/cucumber-tony/rascal.git
+PKG_SOURCE:=$(PKG_NAME).tar.gz
+PKG_VERSION:=1#$(COMMIT)
+#PKG_RELEASE:=1
+#PKG_INSTALL:=1
+
+include $(INCLUDE_DIR)/package.mk
+
+TARGET_CFLAGS += $(FPIC)
+
+define Package/rascal
+SECTION:=utils
+CATEGORY:=Utilities
+DEPENDS:=+libcurl +libpthread +librt +libopenssl +libpcap +libjson
+TITLE:=The little rascal sniffs for mac addresses
+#URL:=http://oss.metaparadigm.com/json-c/
+endef
+
+define Build/Prepare
+mkdir -p $(PKG_BUILD_DIR)
+tar -C $(DL_DIR) -xzvf $(DL_DIR)/$(PKG_NAME).tar.gz
+$(CP) $(DL_DIR)/$(PKG_NAME)/src/* $(PKG_BUILD_DIR)/
+endef
+
+define Package/rascal/conffiles
+/etc/config/rascal
+endef
+
+define Package/rascal/description
+This package contains a compatibility library for packages that have not
+been adapted to the json-c library rename yet
+endef
+
+define Package/rascal/install
+$(INSTALL_DIR) $(1)/usr/bin
+$(CP) $(PKG_BUILD_DIR)/rascal $(1)/usr/bin/rascal
+
+endef
+
+$(eval $(call BuildPackage,rascal))
+
+.PHONY: clean
+	clean:
+	rm -rf $(DL_DIR)/$(PKG_NAME)*
+
