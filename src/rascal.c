@@ -123,21 +123,6 @@ static const struct radiotap_align_size align_size_000000_00[] = {
   [52] = { .align = 1, .size = 4, },
 };
 
-static const struct ieee80211_radiotap_namespace vns_array[] = {
-  {
-    .oui = 0x000000,
-    .subns = 0,
-    .n_bits = sizeof(align_size_000000_00),
-    .align_size = align_size_000000_00,
-  },
-};
-
-static const struct ieee80211_radiotap_vendor_namespaces vns = {
-  .ns = vns_array,
-  .n_ns = sizeof(vns_array)/sizeof(vns_array[0]),
-};
-
-
 typedef struct {
   u_int8_t        it_version;
   u_int8_t        it_pad;
@@ -298,10 +283,6 @@ void print_mac(FILE * stream,u_char * mac) {
 int array_contains(char *array, char *data ) {
   strstr(array, data) != NULL;
 }
-
-void add_to_macs(char *ip, json_object *array, json_object *parent, int count) {
-
-};
 
 void ethernet_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
 {
@@ -528,7 +509,7 @@ int readconfig() {
     }
 
     /* if (verbose) */
-      /* printf("lat: %d, lng: %d, secret: %s\n", lat, lng, secret); */
+    /* printf("lat: %d, lng: %d, secret: %s\n", lat, lng, secret); */
 
     json_object_put(jobj);
 
