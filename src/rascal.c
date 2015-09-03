@@ -614,7 +614,9 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  set_url();
+  /* set_url(); */
+    sprintf(full_url, "%s?id=%s&token=%s", post_url, id, token);
+    printf("token: %s, url: %s\n", token, full_url);
 
   int link_layer_type = pcap_datalink(pcap);
 
