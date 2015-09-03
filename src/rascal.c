@@ -391,6 +391,9 @@ void send_data(json_object *array) {
   CURLcode res;
 
   struct curl_slist *headers = NULL;
+  struct curl_httppost *formdata=NULL;
+  struct curl_httppost *lastptr=NULL;
+
   headers = curl_slist_append(headers, "Accept: application/json");
   headers = curl_slist_append(headers, "Content-Type: application/json");
 
@@ -408,18 +411,35 @@ void send_data(json_object *array) {
   json_object_object_add(obj1,"lat", jlat);
   json_object_object_add(obj1,"lng", jlng);
 
+
   if (verbose)
     printf ("The json object created: %s\n",json_object_to_json_string(obj1));
 
   curl = curl_easy_init();
+
+
   if(curl) {
+    curl_formadd(&formdata,
+        &lastptr,
+        CURLFORM_COPYNAME, "id",
+        CURLFORM_COPYCONTENTS, id,
+        CURLFORM_END);
+
+    curl_formadd(&formdata,
+        &lastptr,
+        CURLFORM_COPYNAME, "token",
+        CURLFORM_COPYCONTENTS, token,
+        CURLFORM_END);
+
+
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
     curl_easy_setopt(curl, CURLOPT_URL, post_url);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "Rascal Bot");
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "id=s&token=s");
-    /* curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_to_json_string(obj1)); */
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_to_json_string(obj1));
+    curl_easy_setopt(curl, CURLOPT_HTTPPOST, formdata);
+
     if (insecure) {
       curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, FALSE);
     }
