@@ -432,7 +432,7 @@ void send_data(json_object *array) {
     /*     CURLFORM_END); */
 
 
-    char *url;
+    char url[255];
     printf("token: %s\n", token);
     sprintf(url, "%s?id=%s&token=%s", post_url, id, token);
 
