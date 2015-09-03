@@ -450,7 +450,7 @@ void send_data(json_object *array) {
 
     res = curl_easy_perform(curl);
     if(res != CURLE_OK) {
-      printf("There was a problem sending to %s\n", post_url);
+      printf("There was a problem sending to %s\n", url);
     }
 
     curl_easy_cleanup(curl);
