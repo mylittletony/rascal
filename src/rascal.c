@@ -115,6 +115,7 @@ static uint8_t verbose = 0;
 int mac_array = 50; // Number of macs 
 int timer = 60; // Number of packets min
 char *config_file = NULL;
+char *full_url;
 char post_url[255];
 char if_name[10];
 char ap_mac[19];
@@ -432,9 +433,6 @@ void send_data(json_object *array) {
     /*     CURLFORM_END); */
 
 
-    char url[255];
-    printf("token: %s\n", token);
-    sprintf(url, "%s?id=%s&token=%s", post_url, id, token);
 
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
     curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -564,6 +562,12 @@ void intHandle(int dummy){
 
 };
 
+void set_url() {
+    /* strcpy(full_url, url */
+    printf("token: %s\n", token);
+    sprintf(full_url, "%s?id=%s&token=%s", post_url, id, token);
+}
+
 int main(int argc, char *argv[]) {
 
   signal(SIGINT, intHandle);
@@ -624,6 +628,8 @@ int main(int argc, char *argv[]) {
     printf("%s\n", pcap_errbuf);
     exit(1);
   }
+
+  set_url();
 
   int link_layer_type = pcap_datalink(pcap);
 
