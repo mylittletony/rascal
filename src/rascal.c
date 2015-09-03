@@ -40,6 +40,7 @@
  */
 
 #include <stdio.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <syslog.h>
 #include <pcap/pcap.h>
@@ -120,6 +121,7 @@ double lng;
 double lat;
 char secret[];
 char token[];
+static volatile int keepRunning = 1;
 
 static const struct radiotap_align_size align_size_000000_00[] = {
   [0] = { .align = 1, .size = 4, },
@@ -524,90 +526,103 @@ int readconfig() {
   return 1;
 }
 
+void intHandle(int dummy){
+
+  openlog(SYSLOG_NAME, LOG_PID|LOG_CONS, LOG_USER);
+  syslog (LOG_INFO, "exiting listener...");
+  closelog ();
+
+  keepRunning = 0;
+
+};
 
 int main(int argc, char *argv[]) {
 
-  curl_global_init( CURL_GLOBAL_ALL );
+  signal(SIGINT, intHandle);
+  while (keepRunning) {
+    curl_global_init( CURL_GLOBAL_ALL );
 
-  char pcap_errbuf[PCAP_ERRBUF_SIZE];
-  struct bpf_program fp;
-  char filter_exp[] = "ip";
-  bpf_u_int32 net;
-  pcap_errbuf[0] = '\0';
+    char pcap_errbuf[PCAP_ERRBUF_SIZE];
+    struct bpf_program fp;
+    char filter_exp[] = "ip";
+    bpf_u_int32 net;
+    pcap_errbuf[0] = '\0';
 
-  int  c;
-  opterr = 0;
+    int  c;
+    opterr = 0;
 
-  while ((c = getopt(argc, argv, "i:m:c:vk")) != -1) {
-    switch(c) {
-      case 'i':
-        strcpy(if_name, optarg);
-        break;
-      case 'm':
-        strcpy(ap_mac, optarg);
-        break;
-      case 'k':
-        insecure = 1;
-        break;
-      case 'v':
-        verbose = 1;
-        break;
-      case 'c':
-        config_file = optarg;
-      default:
-        abort();
+    while ((c = getopt(argc, argv, "i:m:c:vk")) != -1) {
+      switch(c) {
+        case 'i':
+          strcpy(if_name, optarg);
+          break;
+        case 'm':
+          strcpy(ap_mac, optarg);
+          break;
+        case 'k':
+          insecure = 1;
+          break;
+        case 'v':
+          verbose = 1;
+          break;
+        case 'c':
+          config_file = optarg;
+        default:
+          abort();
+      }
     }
-  }
 
-  readconfig();
+    readconfig();
 
-  if ( if_name == NULL ) {
-    strcpy(if_name, "eth0");
-  }
-
-  if (verbose) 
-    printf("Listen on interface %s\n", if_name);
-
-  openlog(SYSLOG_NAME, LOG_PID|LOG_CONS, LOG_USER);
-  syslog (LOG_INFO, "listener has been started on %s ", if_name);
-  closelog ();
-
-  pcap_t *pcap = pcap_open_live(if_name, 1024, 0, 1, pcap_errbuf);
-  if (!pcap) {
-    printf("%s\n", pcap_errbuf);
-    exit(1);
-  }
-
-  int link_layer_type = pcap_datalink(pcap);
-
-  if (link_layer_type != DLT_IEEE802_11_RADIO) {
-    fprintf(stderr, "Not using the Wi-Fi interface, are you testing something?\n");
-    if (pcap_compile(pcap, &fp, filter_exp, 0, net) == -1) {
-      fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(pcap));
-      exit(EXIT_FAILURE);
+    if ( if_name == NULL ) {
+      strcpy(if_name, "eth0");
     }
-    if (pcap_setfilter(pcap, &fp) == -1) {
-      fprintf(stderr, "Couldn't install filter %s: %s\n",
-          filter_exp, pcap_geterr(pcap));
-      exit(EXIT_FAILURE);
+
+    if (verbose) 
+      printf("Listen on interface %s\n", if_name);
+
+    openlog(SYSLOG_NAME, LOG_PID|LOG_CONS, LOG_USER);
+    syslog (LOG_INFO, "listener has been started on %s ", if_name);
+    closelog ();
+
+    pcap_t *pcap = pcap_open_live(if_name, 1024, 0, 1, pcap_errbuf);
+    if (!pcap) {
+      printf("%s\n", pcap_errbuf);
+      exit(1);
     }
-    pcap_loop(pcap, -1, ethernet_packet, NULL);
 
-  } else {
+    int link_layer_type = pcap_datalink(pcap);
 
-    struct bpf_program filter_probe_req;
-    struct bpf_program filter_probe_resp;
-    pcap_compile(pcap, &filter_probe_req, "type mgt subtype probe-req", 1, PCAP_NETMASK_UNKNOWN);
-    pcap_setfilter(pcap, &filter_probe_req);
+    if (link_layer_type != DLT_IEEE802_11_RADIO) {
+      fprintf(stderr, "Not using the Wi-Fi interface, are you testing something?\n");
+      if (pcap_compile(pcap, &fp, filter_exp, 0, net) == -1) {
+        fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(pcap));
+        exit(EXIT_FAILURE);
+      }
+      if (pcap_setfilter(pcap, &fp) == -1) {
+        fprintf(stderr, "Couldn't install filter %s: %s\n",
+            filter_exp, pcap_geterr(pcap));
+        exit(EXIT_FAILURE);
+      }
+      pcap_loop(pcap, -1, ethernet_packet, NULL);
 
-    /* pcap_compile(pcap, &filter_probe_resp, "type mgt subtype probe-resp", 1, PCAP_NETMASK_UNKNOWN); */
-    /* pcap_setfilter(pcap, &filter_probe_resp); */
+    } else {
 
-    pcap_loop(pcap, -1, pcap_callback, NULL);
+      struct bpf_program filter_probe_req;
+      struct bpf_program filter_probe_resp;
+      pcap_compile(pcap, &filter_probe_req, "type mgt subtype probe-req", 1, PCAP_NETMASK_UNKNOWN);
+      pcap_setfilter(pcap, &filter_probe_req);
+
+      /* pcap_compile(pcap, &filter_probe_resp, "type mgt subtype probe-resp", 1, PCAP_NETMASK_UNKNOWN); */
+      /* pcap_setfilter(pcap, &filter_probe_resp); */
+
+      pcap_loop(pcap, -1, pcap_callback, NULL);
+    }
+
+    printf("Done");
+    pcap_close(pcap);
   }
 
-  printf("Done");
-  pcap_close(pcap);
   return 0;
 
 }
