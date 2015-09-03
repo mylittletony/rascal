@@ -56,7 +56,7 @@
 #include <time.h>
 #include <curl/curl.h>
 
-#define MAC_CACHE_LEN 30
+/* #define MAC_CACHE_LEN 30 */
 #define MESSAGE_BUFF_LEN 600 /* 18 LEN OF MAC * 20, MAX CACHE */
 
 // Only for the ethernet tests //
@@ -112,6 +112,8 @@ void send_data(json_object *data);
 
 static uint8_t insecure = 0;
 static uint8_t verbose = 0;
+int mac_array = 50; // Number of macs 
+int timer = 60; // Number of packets min
 char *config_file = NULL;
 char post_url[255];
 char if_name[10];
@@ -119,7 +121,7 @@ char ap_mac[19];
 char ap_mac[19];
 double lng;
 double lat;
-char secret[];
+char id[];
 char token[];
 
 static const struct radiotap_align_size align_size_000000_00[] = {
@@ -262,7 +264,7 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   if (verbose)
     printf("Packet number: %d\n", count);
 
-  if ((arraylen >= MAC_CACHE_LEN && count > 60) || (arraylen > 0 && count >= 240)) {
+  if ((arraylen >= mac_array && count > timer) || (arraylen > 0 && count >= 240)) {
     memset(buf, 0, sizeof buf);
     if (verbose)
       printf ("The json object created: %s\n",json_object_to_json_string(array));
@@ -393,14 +395,14 @@ void send_data(json_object *array) {
 
   json_object *obj1 = json_object_new_object();
   json_object *japmac = json_object_new_string(ap_mac);
-  json_object *jsecret = json_object_new_string(secret);
+  json_object *jid = json_object_new_string(id);
   json_object *jtoken = json_object_new_string(token);
   json_object *jlat = json_object_new_double(lat);
   json_object *jlng = json_object_new_double(lng);
 
   json_object_object_add(obj1,"ap_mac", japmac);
   json_object_object_add(obj1,"data", array);
-  json_object_object_add(obj1,"secret", jsecret);
+  json_object_object_add(obj1,"id", jid);
   json_object_object_add(obj1,"token", jtoken);
   json_object_object_add(obj1,"lat", jlat);
   json_object_object_add(obj1,"lng", jlng);
@@ -502,8 +504,8 @@ int readconfig() {
             if (strcmp(key,"rs_iface") == 0) {
               strcpy(if_name, json_object_get_string(val0));
             }
-            if (strcmp(key,"rs_secret") == 0) {
-              strcpy(secret, json_object_get_string(val0));
+            if (strcmp(key,"location_id") == 0) {
+              strcpy(id, json_object_get_string(val0));
             }
             if (strcmp(key,"rs_token") == 0) {
               strcpy(token, json_object_get_string(val0));
@@ -517,7 +519,7 @@ int readconfig() {
     }
 
     /* if (verbose) */
-    /* printf("lat: %d, lng: %d, secret: %s\n", lat, lng, secret); */
+    /* printf("lat: %d, lng: %d, id: %s\n", lat, lng, id); */
 
     json_object_put(jobj);
 
@@ -548,7 +550,7 @@ int main(int argc, char *argv[]) {
   int  c;
   opterr = 0;
 
-  while ((c = getopt(argc, argv, "i:m:c:vk")) != -1) {
+  while ((c = getopt(argc, argv, "i:m:c:t:a:t:vk")) != -1) {
     switch(c) {
       case 'i':
         strcpy(if_name, optarg);
@@ -564,6 +566,13 @@ int main(int argc, char *argv[]) {
         break;
       case 'c':
         config_file = optarg;
+        break;
+      case 't':
+        timer = atoi(optarg);
+        break;
+      case 'a':
+        mac_array = atoi(optarg);
+        break;
       default:
         abort();
     }
