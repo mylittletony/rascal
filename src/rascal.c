@@ -122,8 +122,8 @@ char if_name[10];
 char ap_mac[19];
 double lng;
 double lat;
-char id[19];
-unsigned char token[36];
+/* char id[19]; */
+/* unsigned char token[36]; */
 
 static const struct radiotap_align_size align_size_000000_00[] = {
   [0] = { .align = 1, .size = 4, },
@@ -400,15 +400,11 @@ void send_data(json_object *array) {
 
   json_object *obj1 = json_object_new_object();
   json_object *japmac = json_object_new_string(ap_mac);
-  json_object *jid = json_object_new_string(id);
-  json_object *jtoken = json_object_new_string(token);
   json_object *jlat = json_object_new_double(lat);
   json_object *jlng = json_object_new_double(lng);
 
   json_object_object_add(obj1,"ap_mac", japmac);
   json_object_object_add(obj1,"data", array);
-  json_object_object_add(obj1,"id", jid);
-  json_object_object_add(obj1,"token", jtoken);
   json_object_object_add(obj1,"lat", jlat);
   json_object_object_add(obj1,"lng", jlng);
 
@@ -421,12 +417,8 @@ void send_data(json_object *array) {
 
   if(curl) {
 
-    char *full_url;
-    sprintf(full_url, "%s?id=%s&token=%s", post_url, id, token);
-    printf("orig: %s, token: %s, url: %s\n", post_url, token, full_url);
-
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
-    curl_easy_setopt(curl, CURLOPT_URL, full_url);
+    curl_easy_setopt(curl, CURLOPT_URL, post_url);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "Rascal Bot");
@@ -439,7 +431,7 @@ void send_data(json_object *array) {
 
     res = curl_easy_perform(curl);
     if(res != CURLE_OK) {
-      printf("There was a problem sending to %s\n", full_url);
+      printf("There was a problem sending to %s\n", post_url);
     }
 
     curl_easy_cleanup(curl);
@@ -521,14 +513,14 @@ int readconfig() {
             if (strcmp(key,"rs_iface") == 0) {
               strcpy(if_name, json_object_get_string(val0));
             }
-            if (strcmp(key,"location_id") == 0) {
-              strcpy(id, json_object_get_string(val0));
-            }
-            if (strcmp(key,"rs_token") == 0) {
-              /* token = "123"; */
-              /* token = json_object_get_string(val0); */
-              strcpy(token, json_object_get_string(val0));
-            }
+            /* if (strcmp(key,"location_id") == 0) { */
+            /*   strcpy(id, json_object_get_string(val0)); */
+            /* } */
+            /* if (strcmp(key,"rs_token") == 0) { */
+            /*   /1* token = "123"; *1/ */
+            /*   /1* token = json_object_get_string(val0); *1/ */
+            /*   strcpy(token, json_object_get_string(val0)); */
+            /* } */
             break;
         }
       }
