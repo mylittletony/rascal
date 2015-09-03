@@ -435,7 +435,7 @@ void send_data(json_object *array) {
 
 
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
-    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_URL, full_url);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "Rascal Bot");
@@ -448,7 +448,7 @@ void send_data(json_object *array) {
 
     res = curl_easy_perform(curl);
     if(res != CURLE_OK) {
-      printf("There was a problem sending to %s\n", url);
+      printf("There was a problem sending to %s\n", full_url);
     }
 
     curl_easy_cleanup(curl);
