@@ -568,7 +568,7 @@ int main(int argc, char *argv[]) {
     printf("Listen on interface %s\n", if_name);
 
   openlog("Rascal", LOG_PID|LOG_CONS, LOG_USER);
-  syslog (LOG_INFO, "shared library has been invoked");
+  syslog (LOG_INFO, "listener has been started on %s ", if_name);
   closelog ();
 
   pcap_t *pcap = pcap_open_live(if_name, 1024, 0, 1, pcap_errbuf);
