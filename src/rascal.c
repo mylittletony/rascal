@@ -399,21 +399,21 @@ void send_data(json_object *array) {
   headers = curl_slist_append(headers, "Content-Type: application/json");
 
   json_object *obj1 = json_object_new_object();
+  json_object *jvs = json_object_new_int(1);
   json_object *japmac = json_object_new_string(ap_mac);
   json_object *jlat = json_object_new_double(lat);
   json_object *jlng = json_object_new_double(lng);
 
+  json_object_object_add(obj1,"v", jvs);
   json_object_object_add(obj1,"ap_mac", japmac);
   json_object_object_add(obj1,"data", array);
   json_object_object_add(obj1,"lat", jlat);
   json_object_object_add(obj1,"lng", jlng);
 
-
   if (verbose)
     printf ("The json object created: %s\n",json_object_to_json_string(obj1));
 
   curl = curl_easy_init();
-
 
   if(curl) {
 
