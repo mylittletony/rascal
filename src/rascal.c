@@ -119,7 +119,6 @@ char full_url[255];
 char post_url[255];
 char if_name[10];
 char ap_mac[19];
-char ap_mac[19];
 double lng;
 double lat;
 char id[];
@@ -420,19 +419,6 @@ void send_data(json_object *array) {
 
 
   if(curl) {
-    /* curl_formadd(&formdata, */
-    /*     &lastptr, */
-    /*     CURLFORM_COPYNAME, "id", */
-    /*     CURLFORM_COPYCONTENTS, id, */
-    /*     CURLFORM_END); */
-
-    /* curl_formadd(&formdata, */
-    /*     &lastptr, */
-    /*     CURLFORM_COPYNAME, "token", */
-    /*     CURLFORM_COPYCONTENTS, token, */
-    /*     CURLFORM_END); */
-
-
 
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
     curl_easy_setopt(curl, CURLOPT_URL, full_url);
@@ -563,8 +549,8 @@ void intHandle(int dummy){
 };
 
 void set_url() {
-    printf("token: %s\n", token);
     sprintf(full_url, "%s?id=%s&token=%s", post_url, id, token);
+    printf("token: %s, url: %s\n", token, full_url);
 }
 
 int main(int argc, char *argv[]) {
