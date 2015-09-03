@@ -396,15 +396,15 @@ void send_data(json_object *array) {
 
   json_object *obj1 = json_object_new_object();
   json_object *japmac = json_object_new_string(ap_mac);
-  json_object *jid = json_object_new_string(id);
-  json_object *jtoken = json_object_new_string(token);
+  /* json_object *jid = json_object_new_string(id); */
+  /* json_object *jtoken = json_object_new_string(token); */
   json_object *jlat = json_object_new_double(lat);
   json_object *jlng = json_object_new_double(lng);
 
   json_object_object_add(obj1,"ap_mac", japmac);
   json_object_object_add(obj1,"data", array);
-  json_object_object_add(obj1,"id", jid);
-  json_object_object_add(obj1,"token", jtoken);
+  /* json_object_object_add(obj1,"id", jid); */
+  /* json_object_object_add(obj1,"token", jtoken); */
   json_object_object_add(obj1,"lat", jlat);
   json_object_object_add(obj1,"lng", jlng);
 
@@ -419,7 +419,7 @@ void send_data(json_object *array) {
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "Rascal Bot");
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "id=s&token=s");
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_to_json_string(obj1));
+    /* curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_to_json_string(obj1)); */
     if (insecure) {
       curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, FALSE);
     }
