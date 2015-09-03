@@ -525,9 +525,9 @@ int readconfig() {
               strcpy(id, json_object_get_string(val0));
             }
             if (strcmp(key,"rs_token") == 0) {
-              /* token = "123"; */
+              token = "123";
               /* token = json_object_get_string(val0); */
-              strcpy(token, json_object_get_string(val0));
+              /* strcpy(token, json_object_get_string(val0)); */
             }
             break;
         }
