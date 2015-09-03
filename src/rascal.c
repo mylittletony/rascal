@@ -119,7 +119,6 @@ double lng;
 double lat;
 char secret[];
 char token[];
-char *msg;
 
 static const struct radiotap_align_size align_size_000000_00[] = {
   [0] = { .align = 1, .size = 4, },
@@ -572,6 +571,7 @@ int main(int argc, char *argv[]) {
   if (verbose) 
     printf("Listen on interface %s\n", if_name);
 
+  char *msg;
   sprintf(msg, "Starting the Rascal on %s", if_name);
   syslog_msg(msg);
 
