@@ -121,7 +121,7 @@ char if_name[10];
 char ap_mac[19];
 double lng;
 double lat;
-char id[];
+char id[19];
 char token[36];
 
 static const struct radiotap_align_size align_size_000000_00[] = {
