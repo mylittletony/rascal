@@ -391,23 +391,23 @@ void send_data(json_object *array) {
   CURLcode res;
 
   struct curl_slist *headers = NULL;
-  struct curl_httppost *formdata=NULL;
-  struct curl_httppost *lastptr=NULL;
+  /* struct curl_httppost *formdata=NULL; */
+  /* struct curl_httppost *lastptr=NULL; */
 
   headers = curl_slist_append(headers, "Accept: application/json");
   headers = curl_slist_append(headers, "Content-Type: application/json");
 
   json_object *obj1 = json_object_new_object();
   json_object *japmac = json_object_new_string(ap_mac);
-  /* json_object *jid = json_object_new_string(id); */
-  /* json_object *jtoken = json_object_new_string(token); */
+  json_object *jid = json_object_new_string(id);
+  json_object *jtoken = json_object_new_string(token);
   json_object *jlat = json_object_new_double(lat);
   json_object *jlng = json_object_new_double(lng);
 
   json_object_object_add(obj1,"ap_mac", japmac);
   json_object_object_add(obj1,"data", array);
-  /* json_object_object_add(obj1,"id", jid); */
-  /* json_object_object_add(obj1,"token", jtoken); */
+  json_object_object_add(obj1,"id", jid);
+  json_object_object_add(obj1,"token", jtoken);
   json_object_object_add(obj1,"lat", jlat);
   json_object_object_add(obj1,"lng", jlng);
 
@@ -419,26 +419,29 @@ void send_data(json_object *array) {
 
 
   if(curl) {
-    curl_formadd(&formdata,
-        &lastptr,
-        CURLFORM_COPYNAME, "id",
-        CURLFORM_COPYCONTENTS, id,
-        CURLFORM_END);
+    /* curl_formadd(&formdata, */
+    /*     &lastptr, */
+    /*     CURLFORM_COPYNAME, "id", */
+    /*     CURLFORM_COPYCONTENTS, id, */
+    /*     CURLFORM_END); */
 
-    curl_formadd(&formdata,
-        &lastptr,
-        CURLFORM_COPYNAME, "token",
-        CURLFORM_COPYCONTENTS, token,
-        CURLFORM_END);
+    /* curl_formadd(&formdata, */
+    /*     &lastptr, */
+    /*     CURLFORM_COPYNAME, "token", */
+    /*     CURLFORM_COPYCONTENTS, token, */
+    /*     CURLFORM_END); */
 
+
+    char *url;
+    sprintf(url, "%s?%s&%s", post_url, id, token);
 
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
-    curl_easy_setopt(curl, CURLOPT_URL, post_url);
+    curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "Rascal Bot");
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_to_json_string(obj1));
-    curl_easy_setopt(curl, CURLOPT_HTTPPOST, formdata);
+    /* curl_easy_setopt(curl, CURLOPT_HTTPPOST, formdata); */
 
     if (insecure) {
       curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, FALSE);
@@ -452,6 +455,8 @@ void send_data(json_object *array) {
     curl_easy_cleanup(curl);
     curl_slist_free_all(headers);
     json_object_put(obj1);
+    /* curl_formfree(formdata); */
+
   }
 
   curl_global_cleanup();
