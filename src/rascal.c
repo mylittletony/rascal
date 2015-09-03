@@ -418,6 +418,7 @@ void send_data(json_object *array) {
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "Rascal Bot");
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "id=s&token=s");
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_to_json_string(obj1));
     if (insecure) {
       curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, FALSE);
