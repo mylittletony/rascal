@@ -63,6 +63,7 @@
 #define SIZE_ETHERNET     14
 #define SNAP_LEN          1518
 #define ETHER_ADDR_LEN6   6
+#define SYSLOG_NAME       "Rascal"
 
 struct sniff_ethernet {
   u_char  ether_dhost[ETHER_ADDR_LEN];    /*  destination host address */
@@ -567,7 +568,7 @@ int main(int argc, char *argv[]) {
   if (verbose) 
     printf("Listen on interface %s\n", if_name);
 
-  openlog("Rascal", LOG_PID|LOG_CONS, LOG_USER);
+  openlog(SYSLOG_NAME, LOG_PID|LOG_CONS, LOG_USER);
   syslog (LOG_INFO, "listener has been started on %s ", if_name);
   closelog ();
 
