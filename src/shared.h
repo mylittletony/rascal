@@ -1,1 +1,1 @@
-extern char if_name[10];
+extern char * token;

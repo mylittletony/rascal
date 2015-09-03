@@ -49,6 +49,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <net/ethernet.h>
+#include "shared.h"
 #include "radiotap.h"
 #include "radiotap_iter.h"
 #include <arpa/inet.h>
@@ -122,7 +123,7 @@ char ap_mac[19];
 double lng;
 double lat;
 char id[19];
-char token[36];
+char * token;
 
 static const struct radiotap_align_size align_size_000000_00[] = {
   [0] = { .align = 1, .size = 4, },
@@ -524,6 +525,8 @@ int readconfig() {
               strcpy(id, json_object_get_string(val0));
             }
             if (strcmp(key,"rs_token") == 0) {
+              /* token = "123"; */
+              /* token = json_object_get_string(val0); */
               strcpy(token, json_object_get_string(val0));
             }
             break;
