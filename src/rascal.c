@@ -107,6 +107,7 @@ void send_data(json_object *data);
 
 // End only for the ethernet tests //
 
+static uint8_t insecure = 0;
 static uint8_t verbose = 0;
 char *config_file = NULL;
 char post_url[255];
@@ -410,7 +411,11 @@ void send_data(json_object *array) {
     curl_easy_setopt(curl, CURLOPT_URL, post_url);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "Rascal Bot");
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_to_json_string(obj1));
+    if (insecure) {
+      curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+    }
 
     res = curl_easy_perform(curl);
     if(res != CURLE_OK) {
@@ -531,13 +536,16 @@ int main(int argc, char *argv[]) {
   int  c;
   opterr = 0;
 
-  while ((c = getopt(argc, argv, "i:m:c:v")) != -1) {
+  while ((c = getopt(argc, argv, "i:m:c:vk")) != -1) {
     switch(c) {
       case 'i':
         strcpy(if_name, optarg);
         break;
       case 'm':
         strcpy(ap_mac, optarg);
+        break;
+      case 'k':
+        insecure = 1;
         break;
       case 'v':
         verbose = 1;
