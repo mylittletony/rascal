@@ -115,7 +115,7 @@ static uint8_t verbose = 0;
 int mac_array = 50; // Number of macs 
 int timer = 60; // Number of packets min
 char *config_file = NULL;
-char full_url[255];
+/* char full_url[255]; */
 char post_url[255];
 char if_name[10];
 char ap_mac[19];
@@ -420,6 +420,10 @@ void send_data(json_object *array) {
 
   if(curl) {
 
+    char *full_url;
+    sprintf(full_url, "%s?id=%s&token=%s", post_url, id, token);
+    printf("orig: %s, token: %s, url: %s\n", post_url, token, full_url);
+
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
     curl_easy_setopt(curl, CURLOPT_URL, full_url);
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -548,10 +552,10 @@ void intHandle(int dummy){
 
 };
 
-void set_url() {
-    sprintf(full_url, "%s?id=%s&token=%s", post_url, id, token);
-    printf("token: %s, url: %s\n", token, full_url);
-}
+/* void set_url() { */
+/*     sprintf(full_url, "%s?id=%s&token=%s", post_url, id, token); */
+/*     printf("orig: %s, token: %s, url: %s\n", post_url, token, full_url); */
+/* } */
 
 int main(int argc, char *argv[]) {
 
@@ -615,8 +619,6 @@ int main(int argc, char *argv[]) {
   }
 
   /* set_url(); */
-    /* sprintf(full_url, "%s?id=%s&token=%s", post_url, id, token); */
-    printf("orig: %s, token: %s, url: %s\n", post_url, token, full_url);
 
   int link_layer_type = pcap_datalink(pcap);
 
