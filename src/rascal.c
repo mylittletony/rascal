@@ -571,8 +571,8 @@ int main(int argc, char *argv[]) {
   if (verbose) 
     printf("Listen on interface %s\n", if_name);
 
-  /* char *msg; */
-  /* sprintf(msg, "Starting the Rascal on %s", if_name); */
+  char *msg;
+  sprintf(msg, "Starting the Rascal on %s", if_name);
   /* syslog_msg(msg); */
 
   pcap_t *pcap = pcap_open_live(if_name, 1024, 0, 1, pcap_errbuf);
