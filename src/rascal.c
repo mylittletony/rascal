@@ -115,7 +115,7 @@ static uint8_t verbose = 0;
 int mac_array = 50; // Number of macs 
 int timer = 60; // Number of packets min
 char *config_file = NULL;
-char *full_url;
+char full_url[255];
 char post_url[255];
 char if_name[10];
 char ap_mac[19];
@@ -563,7 +563,6 @@ void intHandle(int dummy){
 };
 
 void set_url() {
-    /* strcpy(full_url, url */
     printf("token: %s\n", token);
     sprintf(full_url, "%s?id=%s&token=%s", post_url, id, token);
 }
