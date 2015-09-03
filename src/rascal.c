@@ -264,6 +264,7 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   if (verbose)
     printf("Packet number: %d\n", count);
 
+  printf("macs: %d, timer: %d\n", mac_array, time);
   if ((arraylen >= mac_array && count > timer) || (arraylen > 0 && count >= 240)) {
     memset(buf, 0, sizeof buf);
     if (verbose)
