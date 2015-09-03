@@ -122,7 +122,7 @@ char ap_mac[19];
 double lng;
 double lat;
 char id[];
-char token[32];
+char token[36];
 
 static const struct radiotap_align_size align_size_000000_00[] = {
   [0] = { .align = 1, .size = 4, },
