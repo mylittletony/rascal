@@ -41,6 +41,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <syslog.h>
 #include <pcap/pcap.h>
 #include <stdint.h>
 #include <unistd.h>
@@ -118,6 +119,7 @@ double lng;
 double lat;
 char secret[];
 char token[];
+char *msg;
 
 static const struct radiotap_align_size align_size_000000_00[] = {
   [0] = { .align = 1, .size = 4, },
@@ -155,6 +157,10 @@ void format_mac(u_char * mac, char * f);
 int array_contains(char *array, char *ip );
 
 struct json_object *obj1, *obj2, *array, *tmp1, *tmp2;
+
+void syslog_msg(char * msg) {
+  printf("11111111111111111 %s", msg);
+}
 
 void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) {
 
@@ -563,7 +569,11 @@ int main(int argc, char *argv[]) {
     strcpy(if_name, "eth0");
   }
 
-  printf("Listen on interface %s\n", if_name);
+  if (verbose) 
+    printf("Listen on interface %s\n", if_name);
+
+  sprintf(msg, "Starting the Rascal on %s", if_name);
+  syslog_msg(msg);
 
   pcap_t *pcap = pcap_open_live(if_name, 1024, 0, 1, pcap_errbuf);
   if (!pcap) {
