@@ -434,7 +434,7 @@ void send_data(json_object *array) {
 
     char *url;
     printf("token: %s\n", token);
-    sprintf(url, "%s?%s&%s", post_url, id, token);
+    sprintf(url, "%s?id=%s&token=%s", post_url, id, token);
 
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
     curl_easy_setopt(curl, CURLOPT_URL, url);
