@@ -528,11 +528,11 @@ int readconfig() {
 
 void intHandle(int dummy){
 
+  keepRunning = 0;
   openlog(SYSLOG_NAME, LOG_PID|LOG_CONS, LOG_USER);
   syslog (LOG_INFO, "exiting listener...");
   closelog ();
-
-  keepRunning = 0;
+  exit(1);
 
 };
 
