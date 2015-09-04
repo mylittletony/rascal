@@ -608,7 +608,7 @@ int main(int argc, char *argv[]) {
   closelog ();
 
   pcap_t *pcap = pcap_open_live(if_name, 1024, 0, 1, pcap_errbuf);
-  pcap_set_promisc();
+  pcap_set_promisc(1);
 
   if (!pcap) {
     printf("%s\n", pcap_errbuf);
