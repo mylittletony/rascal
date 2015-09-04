@@ -113,7 +113,7 @@ void send_data(json_object *data);
 
 static uint8_t insecure = 0;
 static uint8_t verbose = 0;
-int mac_array = 50; // Number of macs 
+int mac_array = 50; // Number of macs
 int timer = 60; // Number of packets min
 char *config_file = NULL;
 /* char full_url[255]; */
@@ -170,7 +170,7 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   int8_t rssi;
 
   if ( json_object_get_type(array) != json_type_array) {
-    if (verbose) 
+    if (verbose)
       printf("type of json= %d\n", json_object_get_type(array) == json_type_array);
     array = json_object_new_array();
   };
@@ -204,10 +204,10 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
     hlen = packet[2]+(packet[3]<<8); //Usually 18 or 13 in some cases
     switch (packet[hlen]) {
       case 0x40:
-        printf("Probe request\n"); 
+        printf("Probe request\n");
         break;
       case 0x50:
-        printf("Probe response\n"); 
+        printf("Probe response\n");
         break;
     }
   };
@@ -600,7 +600,7 @@ int main(int argc, char *argv[]) {
     strcpy(if_name, "eth0");
   }
 
-  if (verbose) 
+  if (verbose)
     printf("Listen on interface %s\n", if_name);
 
   openlog(SYSLOG_NAME, LOG_PID|LOG_CONS, LOG_USER);
@@ -608,6 +608,8 @@ int main(int argc, char *argv[]) {
   closelog ();
 
   pcap_t *pcap = pcap_open_live(if_name, 1024, 0, 1, pcap_errbuf);
+  pcap_set_promisc();
+
   if (!pcap) {
     printf("%s\n", pcap_errbuf);
     exit(1);
