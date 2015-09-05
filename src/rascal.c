@@ -165,11 +165,11 @@ struct json_object *obj1, *obj2, *array, *tmp1, *tmp2;
 void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) {
 
   static int count = 1;
-  time_t tzero;
-  /* if (tzero == 0) */ 
-  /* time_t tzero = time(0); */
   
-  printf("Time: %d\n", tzero);
+  clock_t start = clock(), diff;
+  printf("%d\n", start);
+
+  /* printf("Time: %d\n", tzero == NULL); */
   time_t t0 = time(0);
   int err, i, arraylen, radiotap_header_len;
   int8_t rssi;
