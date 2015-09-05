@@ -58,7 +58,7 @@
 #include <curl/curl.h>
 
 /* #define MAC_CACHE_LEN 30 */
-#define MESSAGE_BUFF_LEN 600 /* 18 LEN OF MAC * 20, MAX CACHE */
+#define MESSAGE_BUFF_LEN 2000 /* 18 LEN OF MAC * 20, MAX CACHE */
 
 // Only for the ethernet tests //
 
@@ -279,7 +279,7 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
     memset(buf, 0, sizeof buf);
     send_data(array);
     json_object_put(array);
-    c0 = 0;
+    /* c0 = 0; */
     if (verbose)
       printf ("The json object created: %s\n",json_object_to_json_string(array));
     /* count = 1; */
