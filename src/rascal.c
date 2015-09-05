@@ -161,26 +161,16 @@ void format_mac(u_char * mac, char * f);
 int array_contains(char *array, char *ip );
 
 struct json_object *obj1, *obj2, *array, *tmp1, *tmp2;
-/* const clock_t start = clock(); */
-/* start = clock(); */
 
 void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) {
 
   static int count = 1;
 
-  const clock_t start = clock();
-  clock_t diff;
-  printf("%ld", start);
-  /* diff = start - clock(); */
-  int msec;
+  const clock_t c0 = clock();
+  printf ("\tbegin (CPU):             %d\n", (int) c0);
 
-  msec = start / CLOCKS_PER_SEC;
 
-  printf("Time taken %d seconds\n", msec);
 
-  /* printf("%d\n", start); */
-
-  /* printf("Time: %d\n", tzero == NULL); */
   time_t t0 = time(0);
   int err, i, arraylen, radiotap_header_len;
   int8_t rssi;
