@@ -114,7 +114,7 @@ void send_data(json_object *data);
 static uint8_t insecure = 0;
 static uint8_t verbose = 0;
 int mac_array = 50; // Number of macs
-int timer = 1600; // About 60 seconds still to figure the counter.
+int timer = 1000; // About 60 seconds still to figure the counter.
 char *config_file = NULL;
 char post_url[255];
 char if_name[10];
