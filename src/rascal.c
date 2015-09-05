@@ -171,7 +171,7 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   const clock_t start = clock();
   clock_t diff;
   printf("%ld", start);
-  diff = clock() - start;
+  diff = start - clock();
   int msec = diff;
 
   msec = diff / CLOCKS_PER_SEC;
