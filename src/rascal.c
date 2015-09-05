@@ -166,10 +166,8 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   int diff;
   clock_t c1;
 
-  printf("%d", c0);
   if (c0 == 0) 
     c0 = clock();
-    printf("111 %d\n", c0);
 
   c1 = clock();
 
