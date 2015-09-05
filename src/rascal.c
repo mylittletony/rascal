@@ -161,12 +161,14 @@ void format_mac(u_char * mac, char * f);
 int array_contains(char *array, char *ip );
 
 struct json_object *obj1, *obj2, *array, *tmp1, *tmp2;
-clock_t start;
+/* const clock_t start = clock(); */
+/* start = clock(); */
 
 void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) {
 
   static int count = 1;
  
+  const clock_t start = clock();
   clock_t diff;
   printf("%ld", start);
   diff = clock() - start;
