@@ -270,13 +270,13 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   }
 
   count++;
-  if (verbose)
-    printf("Packet number: %d\n", count);
-
-  /* printf ("\telapsed CPU time:        %f\n", (double) 1000 * (c1 - c0)/CLOCKS_PER_SEC); */
   diff = 1000 * (c1 - c0) / CLOCKS_PER_SEC;
 
-  /* printf("macs: %d, timer: %d\n", mac_array, timer); */
+  if (verbose)
+    printf("Packet number: %d\n", count);
+    printf ("Elapsed CPU time: %d\n", diff);
+
+
   if ((arraylen >= mac_array && diff > timer) || (arraylen > 0 && diff >= 5000)) {
     memset(buf, 0, sizeof buf);
     if (verbose)
