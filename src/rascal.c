@@ -167,12 +167,15 @@ struct json_object *obj1, *obj2, *array, *tmp1, *tmp2;
 void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) {
 
   static int count = 1;
- 
+
   const clock_t start = clock();
   clock_t diff;
   printf("%ld", start);
   diff = clock() - start;
   int msec = diff;
+
+  msec = diff / CLOCKS_PER_SEC;
+
   printf("Time taken %d seconds\n", msec/1000);
 
   /* printf("%d\n", start); */
