@@ -167,7 +167,11 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   static int count = 1;
   
   clock_t start = clock(), diff;
-  printf("%d\n", start);
+  diff = clock() - start;
+  int msec = diff * 1000 / CLOCKS_PER_SEC;
+  printf("Time taken %d seconds %d milliseconds", msec/1000, msec%1000);
+
+  /* printf("%d\n", start); */
 
   /* printf("Time: %d\n", tzero == NULL); */
   time_t t0 = time(0);
