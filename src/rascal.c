@@ -114,7 +114,7 @@ void send_data(json_object *data);
 static uint8_t insecure = 0;
 static uint8_t verbose = 0;
 int mac_array = 50; // Number of macs
-int timer = 60; // Number of packets min
+int timer = 1600; // About 60 seconds still to figure the counter.
 char *config_file = NULL;
 char post_url[255];
 char if_name[10];
@@ -163,7 +163,7 @@ struct json_object *obj1, *obj2, *array, *tmp1, *tmp2;
 void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) {
 
   static int count = 1;
-
+  int diff;
   clock_t c1;
 
   printf("%d", c0);
@@ -172,8 +172,6 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
     printf("111 %d\n", c0);
 
   c1 = clock();
-
-  printf ("\telapsed CPU time:        %f\n", (double) 1000 * (c1 - c0)/CLOCKS_PER_SEC);
 
   time_t t0 = time(0);
   int err, i, arraylen, radiotap_header_len;
@@ -275,8 +273,11 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   if (verbose)
     printf("Packet number: %d\n", count);
 
-  printf("macs: %d, timer: %d\n", mac_array, timer);
-  if ((arraylen >= mac_array && count > timer) || (arraylen > 0 && count >= 240)) {
+  /* printf ("\telapsed CPU time:        %f\n", (double) 1000 * (c1 - c0)/CLOCKS_PER_SEC); */
+  diff = 1000 * (c1 - c0) / CLOCKS_PER_SEC;
+
+  /* printf("macs: %d, timer: %d\n", mac_array, timer); */
+  if ((arraylen >= mac_array && diff > timer) || (arraylen > 0 && diff >= 5000)) {
     memset(buf, 0, sizeof buf);
     if (verbose)
       printf ("The json object created: %s\n",json_object_to_json_string(array));
