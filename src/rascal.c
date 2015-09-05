@@ -410,7 +410,7 @@ void send_data(json_object *array) {
   headers = curl_slist_append(headers, "Content-Type: application/json");
 
   json_object *obj1 = json_object_new_object();
-  json_object *jvs = json_object_new_int(1);
+  json_object *jvs = json_object_new_string("1");
   json_object *japmac = json_object_new_string(ap_mac);
   json_object *jlat = json_object_new_double(lat);
   json_object *jlng = json_object_new_double(lng);
