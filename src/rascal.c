@@ -172,7 +172,6 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
     printf("111 %d\n", c0);
 
   c1 = clock();
-  sleep(1);
 
   printf ("\telapsed CPU time:        %f\n", (double) 1000 * (c1 - c0)/CLOCKS_PER_SEC);
 
