@@ -58,7 +58,7 @@
 #include <curl/curl.h>
 
 /* #define MAC_CACHE_LEN 30 */
-#define MESSAGE_BUFF_LEN 600 /* 18 LEN OF MAC * 20, MAX CACHE */
+#define MESSAGE_BUFF_LEN 2000 /* 18 LEN OF MAC * 20, MAX CACHE */
 
 // Only for the ethernet tests //
 
@@ -114,16 +114,14 @@ void send_data(json_object *data);
 static uint8_t insecure = 0;
 static uint8_t verbose = 0;
 int mac_array = 50; // Number of macs
-int timer = 60; // Number of packets min
+int timer = 1000; // About 60 seconds still to figure the counter.
 char *config_file = NULL;
-/* char full_url[255]; */
 char post_url[255];
 char if_name[10];
 char ap_mac[19];
 double lng;
 double lat;
-/* char id[19]; */
-/* unsigned char token[36]; */
+clock_t c0;
 
 static const struct radiotap_align_size align_size_000000_00[] = {
   [0] = { .align = 1, .size = 4, },
@@ -165,6 +163,14 @@ struct json_object *obj1, *obj2, *array, *tmp1, *tmp2;
 void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) {
 
   static int count = 1;
+  int diff;
+  clock_t c1;
+
+  if (c0 == 0) 
+    c0 = clock();
+
+  c1 = clock();
+
   time_t t0 = time(0);
   int err, i, arraylen, radiotap_header_len;
   int8_t rssi;
@@ -193,9 +199,9 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   while (!(err = ieee80211_radiotap_iterator_next(&iter))) {
     if (iter.this_arg_index == IEEE80211_RADIOTAP_DBM_ANTSIGNAL) {
       rssi = (int8_t)iter.this_arg[0];
-      if (verbose) {
-        printf("antsignal is: %d\n", rssi);
-      }
+      /* if (verbose) { */
+      /*   printf("antsignal is: %d\n", rssi); */
+      /* } */
     }
   };
 
@@ -262,18 +268,22 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   }
 
   count++;
+  diff = 1000 * (c1 - c0) / CLOCKS_PER_SEC;
+
   if (verbose)
     printf("Packet number: %d\n", count);
+    printf ("Elapsed CPU time: %d\n", diff);
 
   if (verbose)
     printf("macs: %d, timer: %d\n", mac_array, timer);
 
-  if ((arraylen >= mac_array && count > timer) || (arraylen > 0 && count >= 240)) {
+  if ((arraylen >= mac_array && diff > timer) || (arraylen > 0 && diff >= 5000)) {
     memset(buf, 0, sizeof buf);
     if (verbose)
       printf ("The json object created: %s\n",json_object_to_json_string(array));
     send_data(array);
     json_object_put(array);
+    c0 = 0;
     count = 1;
   };
 
@@ -294,96 +304,97 @@ int array_contains(char *array, char *data ) {
   strstr(array, data) != NULL;
 }
 
+
 void ethernet_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
 {
 
-  static int count = 1;
-  time_t t0 = time(0);
-  struct json_object *obj1, *obj2, *array, *tmp1, *tmp2;
+  /* static int count = 1; */
+  /* time_t t0 = time(0); */
+  /* struct json_object *obj1, *obj2, *array, *tmp1, *tmp2; */
 
-  char *val_type_str, *str;
-  int val_type, i;
-  val_type = json_object_get_type(array);
+  /* char *val_type_str, *str; */
+  /* int val_type, i; */
+  /* val_type = json_object_get_type(array); */
 
-  switch (val_type) {
-    case json_type_array:
-      val_type_str = "val is an array";
-      break;
-    default:
-      array = json_object_new_array();
-  }
+  /* switch (val_type) { */
+  /*   case json_type_array: */
+  /*     val_type_str = "val is an array"; */
+  /*     break; */
+  /*   default: */
+  /*     array = json_object_new_array(); */
+  /* } */
 
-  obj1 = json_object_new_object();
+  /* obj1 = json_object_new_object(); */
 
-  const struct sniff_ethernet *ethernet;  /* The ethernet header [1] */
-  const struct sniff_ip *ip;              /* The IP header */
-  const struct sniff_tcp *tcp;            /* The TCP header */
-  const char *payload;                    /* Packet payload */
+  /* const struct sniff_ethernet *ethernet;  /1* The ethernet header [1] *1/ */
+  /* const struct sniff_ip *ip;              /1* The IP header *1/ */
+  /* const struct sniff_tcp *tcp;            /1* The TCP header *1/ */
+  /* const char *payload;                    /1* Packet payload *1/ */
 
-  int size_ip;
-  int size_tcp;
-  int size_payload;
-  char *src_ip;
-  char *dst_ip;
+  /* int size_ip; */
+  /* int size_tcp; */
+  /* int size_payload; */
+  /* char *src_ip; */
+  /* char *dst_ip; */
 
-  /* printf("\nPacket number %d:\n", count); */
-  count++;
+  /* /1* printf("\nPacket number %d:\n", count); *1/ */
+  /* count++; */
 
-  ethernet = (struct sniff_ethernet*)(packet);
+  /* ethernet = (struct sniff_ethernet*)(packet); */
 
-  ip = (struct sniff_ip*)(packet + SIZE_ETHERNET);
-  size_ip = IP_HL(ip)*4;
-  if (size_ip < 20) {
-    printf("   * Invalid IP header length: %u bytes\n", size_ip);
-    return;
-  }
+  /* ip = (struct sniff_ip*)(packet + SIZE_ETHERNET); */
+  /* size_ip = IP_HL(ip)*4; */
+  /* if (size_ip < 20) { */
+  /*   printf("   * Invalid IP header length: %u bytes\n", size_ip); */
+  /*   return; */
+  /* } */
 
-  char buf[MESSAGE_BUFF_LEN];
+  /* char buf[MESSAGE_BUFF_LEN]; */
 
-  src_ip = inet_ntoa(ip->ip_src);
-  dst_ip = inet_ntoa(ip->ip_dst);
+  /* src_ip = inet_ntoa(ip->ip_src); */
+  /* dst_ip = inet_ntoa(ip->ip_dst); */
 
-  int arraylen;
+  /* int arraylen; */
 
-  if (!array_contains(buf, src_ip)) {
+  /* if (!array_contains(buf, src_ip)) { */
 
-    obj2 = json_object_new_object();
-    sprintf(buf, src_ip);
-    json_object *jsrc = json_object_new_string(dst_ip);
-    json_object *timestamp = json_object_new_int(t0);
-    json_object_object_add(obj2,"ip", jsrc);
-    json_object_object_add(obj2,"first_seen", timestamp);
-    json_object_object_add(obj2,"last_seen", 0);
-    json_object_array_add(array,obj2);
+  /*   obj2 = json_object_new_object(); */
+  /*   sprintf(buf, src_ip); */
+  /*   json_object *jsrc = json_object_new_string(dst_ip); */
+  /*   json_object *timestamp = json_object_new_int(t0); */
+  /*   json_object_object_add(obj2,"ip", jsrc); */
+  /*   json_object_object_add(obj2,"first_seen", timestamp); */
+  /*   json_object_object_add(obj2,"last_seen", 0); */
+  /*   json_object_array_add(array,obj2); */
 
-  } else {
+  /* } else { */
 
-    arraylen = json_object_array_length(array);
-    for (i = 0; i < arraylen; i++) {
-      tmp1 = json_object_array_get_idx(array, i);
-      json_object_object_get_ex(tmp1, "ip", &tmp2);
+  /*   arraylen = json_object_array_length(array); */
+  /*   for (i = 0; i < arraylen; i++) { */
+  /*     tmp1 = json_object_array_get_idx(array, i); */
+  /*     json_object_object_get_ex(tmp1, "ip", &tmp2); */
 
-      int result = strcmp(json_object_get_string(tmp2), dst_ip);
+  /*     int result = strcmp(json_object_get_string(tmp2), dst_ip); */
 
-      if ( result == 0 ) {
+  /*     if ( result == 0 ) { */
 
-        json_object_object_foreach(tmp1, key, val) {
-          if (strcmp(key, "last_seen") != 0)
-            continue;
-          json_object_object_add(tmp1, key, json_object_new_int(t0));
-          /* break; */
-        }
-        break;
-      }
-    }
+  /*       json_object_object_foreach(tmp1, key, val) { */
+  /*         if (strcmp(key, "last_seen") != 0) */
+  /*           continue; */
+  /*         json_object_object_add(tmp1, key, json_object_new_int(t0)); */
+  /*         /1* break; *1/ */
+  /*       } */
+  /*       break; */
+  /*     } */
+  /*   } */
 
-  }
+  /* } */
 
-  if (arraylen >= 10 || (arraylen > 0 && count >= 1000)) {
-    send_data(array);
-    json_object_put(array);
-    count = 1;
-  };
+  /* if (arraylen >= 10 || (arraylen > 0 && count >= 1000)) { */
+  /*   send_data(array); */
+  /*   json_object_put(array); */
+  /*   count = 1; */
+  /* }; */
 
   return;
 }
@@ -401,7 +412,7 @@ void send_data(json_object *array) {
   headers = curl_slist_append(headers, "Content-Type: application/json");
 
   json_object *obj1 = json_object_new_object();
-  json_object *jvs = json_object_new_int(1);
+  json_object *jvs = json_object_new_string("1");
   json_object *japmac = json_object_new_string(ap_mac);
   json_object *jlat = json_object_new_double(lat);
   json_object *jlng = json_object_new_double(lng);
@@ -527,7 +538,7 @@ int readconfig() {
         }
       }
     } else {
-      exit(1);
+      printf("Could not read json\n");
       return 0;
     }
 
