@@ -270,9 +270,10 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   count++;
   diff = 1000 * (c1 - c0) / CLOCKS_PER_SEC;
 
-  if (verbose)
+  if (verbose) {
     printf("Packet number: %d\n", count);
     printf ("Elapsed CPU time: %d\n", diff);
+  }
 
   if (verbose)
     printf("macs: %d, timer: %d\n", mac_array, timer);
