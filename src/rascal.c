@@ -403,8 +403,6 @@ void send_data(json_object *array) {
   CURLcode res;
 
   struct curl_slist *headers = NULL;
-  /* struct curl_httppost *formdata=NULL; */
-  /* struct curl_httppost *lastptr=NULL; */
 
   headers = curl_slist_append(headers, "Accept: application/json");
   headers = curl_slist_append(headers, "Content-Type: application/json");
