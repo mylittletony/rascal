@@ -113,8 +113,8 @@ void send_data(json_object *data);
 
 static uint8_t insecure = 0;
 static uint8_t verbose = 0;
-int mac_array = 50; // Number of macs
-int timer = 1000; // About 60 seconds still to figure the counter.
+int mac_array = 30; // Number of macs
+int timer = 200; // About 60 seconds still to figure the counter.
 char *config_file = NULL;
 char post_url[255];
 char if_name[10];
@@ -270,10 +270,13 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   count++;
   diff = 1000 * (c1 - c0) / CLOCKS_PER_SEC;
 
-  if (verbose)
+  if (verbose) {
     printf("Packet number: %d\n", count);
     printf ("Elapsed CPU time: %d\n", diff);
+  }
 
+  if (verbose)
+    printf("macs: %d, timer: %d\n", mac_array, timer);
 
   if ((arraylen >= mac_array && diff > timer) || (arraylen > 0 && diff >= 5000)) {
     memset(buf, 0, sizeof buf);
@@ -419,9 +422,6 @@ void send_data(json_object *array) {
   json_object_object_add(obj1,"lat", jlat);
   json_object_object_add(obj1,"lng", jlng);
 
-  if (verbose)
-    printf ("The json object created: %s\n",json_object_to_json_string(obj1));
-
   curl = curl_easy_init();
 
   if(curl) {
@@ -438,6 +438,10 @@ void send_data(json_object *array) {
       curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, FALSE);
     }
 
+    if (verbose) {
+      printf ("Sending this: %s\n",json_object_to_json_string(obj1));
+    }
+      
     res = curl_easy_perform(curl);
     if(res != CURLE_OK) {
       printf("There was a problem sending to %s\n", post_url);
