@@ -432,7 +432,6 @@ void send_data(json_object *array) {
     curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "Rascal Bot");
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_object_to_json_string(obj1));
-    /* curl_easy_setopt(curl, CURLOPT_HTTPPOST, formdata); */
 
     if (insecure) {
       curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, FALSE);
@@ -442,16 +441,18 @@ void send_data(json_object *array) {
       printf ("Sending this: %s\n",json_object_to_json_string(obj1));
     }
       
+    openlog(SYSLOG_NAME, LOG_PID|LOG_CONS, LOG_USER);
     res = curl_easy_perform(curl);
     if(res != CURLE_OK) {
       printf("There was a problem sending to %s\n", post_url);
+      syslog (LOG_INFO, "couldn't send JSON.");
+    } else {
+      syslog (LOG_INFO, "sent JSON to %s", post_url);
     }
-
+    closelog ();
     curl_easy_cleanup(curl);
     curl_slist_free_all(headers);
     json_object_put(obj1);
-    /* curl_formfree(formdata); */
-
   }
 
   curl_global_cleanup();
