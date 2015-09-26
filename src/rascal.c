@@ -296,7 +296,7 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
 }
 
 void updateRssi( int8_t new_rssi, int8_t prev_rssi, char * key, json_object * jsonObj, time_t t0, time_t last_seen ) {
-  if ( new_rssi != 0 && ( new_rssi > prev_rssi) ) {
+  if ( new_rssi != 0 && ( abs(new_rssi) > abs(prev_rssi)) ) {
     json_object_object_add(jsonObj, key, json_object_new_int(new_rssi));
   }
   if ( ( t0 - last_seen ) > 5 ) {
