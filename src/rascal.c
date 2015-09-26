@@ -157,7 +157,10 @@ typedef struct {
 
 void print_mac(FILE * stream,u_char * mac);
 void format_mac(u_char * mac, char * f);
-int array_contains(char *array, char *ip );
+void updateRssi(int8_t new_rssi, int8_t prev_rssi, char * key, json_object * json, time_t t0, time_t last_seen);
+void updateDelta(int8_t new_rssi, int8_t prev_rssi, json_object * jsonObj);
+
+int array_contains(char * array, char * ip );
 
 struct json_object *obj1, *obj2, *array, *tmp1, *tmp2;
 
@@ -249,36 +252,22 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
       tmp1 = json_object_array_get_idx(array, i);
       json_object_object_get_ex(tmp1, "client_mac", &tmp2);
 
-      int result = strcmp(json_object_get_string(tmp2), client_mac);
-
-      if ( result == 0 ) {
-
-        json_object_object_foreach(tmp1, key, val) {
-          time_t last_seen;
-          if (strcmp(key, "last_seen") == 0) {
-            json_object_object_add(tmp1, key, json_object_new_int(t0));
-            last_seen = json_object_get_int(val);
-          }
-          if ( deltaforce ) {
-            if (strcmp(key, "rssi") == 0) {
-              int8_t prerssi;
-              prerssi =  json_object_get_int(val);
-              if ( prerssi == 0 && rssi != 0) {
-                json_object_object_add(tmp1, key, json_object_new_int(rssi));
-              }
-              if ( ( t0 - last_seen ) > 5 ) {
-                int8_t delta;
-                delta = ( prerssi - rssi );
-                json_object_object_add(tmp1, "delta", json_object_new_int(delta));
-                if(verbose)
-                {
-                  printf("\n@@@@\n Difference is %hhd\n, added json %s", delta, json_object_get_string(tmp1));
-                }
-              }
-            }
+      /* if ( strcmp(json_object_get_string(tmp2), client_mac) == 0 ) { */
+      json_object_object_foreach(tmp1, key, val) {
+        time_t last_seen;
+        if (strcmp(key, "last_seen") == 0) {
+          json_object_object_add(tmp1, key, json_object_new_int(t0));
+          last_seen = json_object_get_int(val);
+        }
+        if ( deltaforce ) {
+          if (strcmp(key, "rssi") == 0) {
+            int8_t prev_rssi;
+            prev_rssi =  json_object_get_int(val);
+            updateRssi(rssi, prev_rssi, key, tmp1, t0, last_seen);
           }
         }
       }
+      /* } */
     }
   }
 
@@ -304,6 +293,25 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   };
 
   return;
+}
+
+void updateRssi( int8_t new_rssi, int8_t prev_rssi, char * key, json_object * jsonObj, time_t t0, time_t last_seen ) {
+  if ( new_rssi != 0 && ( new_rssi > prev_rssi) ) {
+    json_object_object_add(jsonObj, key, json_object_new_int(new_rssi));
+  }
+  if ( ( t0 - last_seen ) > 5 ) {
+    updateDelta(new_rssi, prev_rssi, jsonObj);
+  }
+}
+
+void updateDelta(int8_t new_rssi, int8_t prev_rssi, json_object * jsonObj) {
+  int8_t delta;
+  delta = ( prev_rssi - new_rssi );
+  json_object_object_add(jsonObj, "delta", json_object_new_int(delta));
+  if(verbose)
+  {
+    printf("Difference is %hhd\n");
+  }
 }
 
 void format_mac(u_char * mac, char * f) {
