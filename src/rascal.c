@@ -140,7 +140,6 @@ typedef struct {
   u_int8_t        flags;
   u_int8_t        rate;
   int8_t          ant_sig;
-  int8_t          ant_noise;
   int8_t          lock_quality;
   u_int8_t        ant;
 
@@ -176,7 +175,6 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   time_t t0 = time(0);
   int err, i, arraylen, radiotap_header_len;
   int8_t rssi;
-  int8_t noise;
 
   if ( json_object_get_type(array) != json_type_array) {
     if (verbose)
@@ -199,12 +197,10 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
     if (iter.this_arg_index == IEEE80211_RADIOTAP_DBM_ANTSIGNAL) {
       rssi = (int8_t)iter.this_arg[0];
     }
-    if (iter.this_arg_index == IEEE80211_RADIOTAP_DBM_ANTNOISE) {
-      noise = (int8_t)iter.this_arg[0];
-    }
+    /* if (iter.this_arg_index == IEEE80211_RADIOTAP_DBM_ANTNOISE) { */
+    /*   noise = (int8_t)iter.this_arg[0]; */
+    /* } */
   };
-
-  printf("Noise: %d\n", noise);
 
   if (header->len >= 24 && verbose) {
     u_int8_t hlen;
