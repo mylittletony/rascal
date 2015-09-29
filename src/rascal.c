@@ -267,7 +267,7 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
             if ( ( t0 - last_seen ) > 5 ) {
               int8_t delta;
               delta = ( prerssi - rssi );
-              json_object_object_add(tmp1, "Delta", json_object_new_int(delta));
+              json_object_object_add(tmp1, "delta", json_object_new_int(delta));
               if(verbose)
               {
                 printf("\n@@@@\n Difference is %hhd\n, added json %s", delta, json_object_get_string(tmp1));
