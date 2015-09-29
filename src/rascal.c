@@ -253,10 +253,12 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
       if ( result == 0 ) {
 
         json_object_object_foreach(tmp1, key, val) {
+          time_t last_seen;
           if (strcmp(key, "last_seen") == 0) {
             json_object_object_add(tmp1, key, json_object_new_int(t0));
+            last_seen = json_object_get_int(val);
           }
-          if (strcmp(key, "rssi") == 0) {
+          else if (strcmp(key, "rssi") == 0) {
             int8_t prerssi;
             prerssi =  json_object_get_int(val);
             if ( prerssi == 0 && rssi != 0) {
