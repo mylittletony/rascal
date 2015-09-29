@@ -115,6 +115,7 @@ static uint8_t insecure = 0;
 static uint8_t verbose = 0;
 int mac_array = 30; // Number of macs
 int timer = 200; // About 60 seconds still to figure the counter.
+bool deltaforce = false;
 char *config_file = NULL;
 char post_url[255];
 char if_name[10];
@@ -258,19 +259,21 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
             json_object_object_add(tmp1, key, json_object_new_int(t0));
             last_seen = json_object_get_int(val);
           }
-          if (strcmp(key, "rssi") == 0) {
-            int8_t prerssi;
-            prerssi =  json_object_get_int(val);
-            if ( prerssi == 0 && rssi != 0) {
-              json_object_object_add(tmp1, key, json_object_new_int(rssi));
-            }
-            if ( ( t0 - last_seen ) > 5 ) {
-              int8_t delta;
-              delta = ( prerssi - rssi );
-              json_object_object_add(tmp1, "delta", json_object_new_int(delta));
-              if(verbose)
-              {
-                printf("\n@@@@\n Difference is %hhd\n, added json %s", delta, json_object_get_string(tmp1));
+          if ( deltaforce ) {
+            if (strcmp(key, "rssi") == 0) {
+              int8_t prerssi;
+              prerssi =  json_object_get_int(val);
+              if ( prerssi == 0 && rssi != 0) {
+                json_object_object_add(tmp1, key, json_object_new_int(rssi));
+              }
+              if ( ( t0 - last_seen ) > 5 ) {
+                int8_t delta;
+                delta = ( prerssi - rssi );
+                json_object_object_add(tmp1, "delta", json_object_new_int(delta));
+                if(verbose)
+                {
+                  printf("\n@@@@\n Difference is %hhd\n, added json %s", delta, json_object_get_string(tmp1));
+                }
               }
             }
           }
@@ -611,6 +614,9 @@ int main(int argc, char *argv[]) {
         break;
       case 't':
         timer = atoi(optarg);
+        break;
+      case 'd':
+        deltaforce = true;
         break;
       case 'a':
         mac_array = atoi(optarg);
