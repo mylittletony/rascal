@@ -595,7 +595,7 @@ int main(int argc, char *argv[]) {
   int  c;
   opterr = 0;
 
-  while ((c = getopt(argc, argv, "i:m:c:t:a:t:vk")) != -1) {
+  while ((c = getopt(argc, argv, "i:m:c:t:a:t:vkd")) != -1) {
     switch(c) {
       case 'i':
         strcpy(if_name, optarg);
