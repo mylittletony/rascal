@@ -115,7 +115,7 @@ static uint8_t insecure = 0;
 static uint8_t verbose = 0;
 int mac_array = 30; // Number of macs
 int timer = 200; // About 60 seconds still to figure the counter.
-bool deltaforce = false;
+static uint8_t deltaforce = 0;
 char *config_file = NULL;
 char post_url[255];
 char if_name[10];
@@ -616,7 +616,7 @@ int main(int argc, char *argv[]) {
         timer = atoi(optarg);
         break;
       case 'd':
-        deltaforce = true;
+        deltaforce = 1;
         break;
       case 'a':
         mac_array = atoi(optarg);
