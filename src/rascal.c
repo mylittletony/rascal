@@ -122,7 +122,7 @@ char if_name[10];
 char ap_mac[19];
 double lng;
 double lat;
-clock_t c0;
+clock_t c0 = 0;
 
 static const struct radiotap_align_size align_size_000000_00[] = {
   [0] = { .align = 1, .size = 4, },
@@ -169,9 +169,6 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   static int count = 1;
   float diff;
   clock_t c1;
-
-  if (c0 == 0)
-    c0 = clock();
 
   c1 = clock();
 
