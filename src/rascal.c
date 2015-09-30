@@ -176,6 +176,7 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   time_t t0 = time(0);
   int err, i, arraylen, radiotap_header_len;
   int8_t rssi;
+  int8_t noise;
 
   if ( json_object_get_type(array) != json_type_array) {
     if (verbose)
@@ -197,6 +198,10 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   while (!(err = ieee80211_radiotap_iterator_next(&iter))) {
     if (iter.this_arg_index == IEEE80211_RADIOTAP_DBM_ANTSIGNAL) {
       rssi = (int8_t)iter.this_arg[0];
+    }
+    else if (iter.this_arg_index == IEEE80211_RADIOTAP_DBM_ANTNOISE) {
+      noise = (int8_t)iter.this_arg[0];
+      printf("Noise: %d\n", noise)
     }
   };
 
@@ -267,13 +272,13 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
 
   if (verbose) {
     printf("Packet number: %d\n", count);
-    printf ("Time difference is: %d\n", diff);
+    printf("Time difference is: %d\n", diff);
   }
 
   if (verbose)
     printf("macs: %d, timer: %d\n", mac_array, timer);
 
-  if ((arraylen >= mac_array && diff > timer) || (arraylen > 0 && diff >= 5000)) {
+  if ((arraylen >= mac_array && diff > timer) || (arraylen > 0 && diff >= 60)) {
     memset(buf, 0, sizeof buf);
     if (verbose)
       printf ("The json object created: %s\n",json_object_to_json_string(array));
