@@ -201,7 +201,7 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
     }
     else if (iter.this_arg_index == IEEE80211_RADIOTAP_DBM_ANTNOISE) {
       noise = (int8_t)iter.this_arg[0];
-      printf("Noise: %d\n", noise)
+      printf("Noise: %d\n", noise);
     }
   };
 
