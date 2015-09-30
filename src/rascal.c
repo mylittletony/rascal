@@ -267,7 +267,7 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   }
 
   count++;
-  diff = 1000 * (c1 - c0) / CLOCKS_PER_SEC;
+  diff = double( 1000 * (c1 - c0)) / CLOCKS_PER_SEC;
 
   if (verbose) {
     printf("Packet number: %d\n", count);
