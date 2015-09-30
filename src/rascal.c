@@ -267,7 +267,7 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
 
   if (verbose) {
     printf("Packet number: %d\n", count);
-    printf ("Elapsed CPU time: %f\n", diff);
+    printf ("Time difference is: %d\n", diff);
   }
 
   if (verbose)
