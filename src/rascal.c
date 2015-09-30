@@ -114,7 +114,7 @@ void send_data(json_object *data);
 static uint8_t insecure = 0;
 static uint8_t verbose = 0;
 int mac_array = 30; // Number of macs
-int timer = 200; // About 60 seconds still to figure the counter.
+int timer = 60; // About 60 seconds still to figure the counter.
 static uint8_t deltaforce = 0;
 char *config_file = NULL;
 char post_url[255];
@@ -122,7 +122,8 @@ char if_name[10];
 char ap_mac[19];
 double lng;
 double lat;
-clock_t c0 = 0;
+/* clock_t c0 = 0; */
+time_t start = 0;
 
 static const struct radiotap_align_size align_size_000000_00[] = {
   [0] = { .align = 1, .size = 4, },
@@ -167,8 +168,10 @@ struct json_object *obj1, *obj2, *array, *tmp1, *tmp2;
 void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char *packet) {
 
   static int count = 1;
-  float diff;
-  clock_t c1 = clock();
+  int diff;
+  if (start == 0) {
+    start = time(0);
+  }
 
   time_t t0 = time(0);
   int err, i, arraylen, radiotap_header_len;
@@ -191,16 +194,9 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
 
   radiotap_header_len = iter._max_length;
 
-  /* if (verbose) { */
-  /*   /1* printf("header length: %d\n", radiotap_header_len); *1/ */
-  /* }; */
-
   while (!(err = ieee80211_radiotap_iterator_next(&iter))) {
     if (iter.this_arg_index == IEEE80211_RADIOTAP_DBM_ANTSIGNAL) {
       rssi = (int8_t)iter.this_arg[0];
-      /* if (verbose) { */
-      /*   printf("antsignal is: %d\n", rssi); */
-      /* } */
     }
   };
 
@@ -267,7 +263,7 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
   }
 
   count++;
-  diff = double( 1000 * (c1 - c0)) / CLOCKS_PER_SEC;
+  diff = (t0 - start);
 
   if (verbose) {
     printf("Packet number: %d\n", count);
@@ -283,7 +279,7 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
       printf ("The json object created: %s\n",json_object_to_json_string(array));
     send_data(array);
     json_object_put(array);
-    c0 = 0;
+    start = time(0);
     count = 1;
   };
 
