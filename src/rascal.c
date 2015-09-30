@@ -168,9 +168,7 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
 
   static int count = 1;
   float diff;
-  clock_t c1;
-
-  c1 = clock();
+  clock_t c1 = clock();
 
   time_t t0 = time(0);
   int err, i, arraylen, radiotap_header_len;
@@ -273,7 +271,7 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
 
   if (verbose) {
     printf("Packet number: %d\n", count);
-    printf ("Elapsed CPU time: %d\n", diff);
+    printf ("Elapsed CPU time: %f\n", diff);
   }
 
   if (verbose)
