@@ -1,10 +1,10 @@
-COMMIT=333ffa8a4a3d88dd2767cd035324e9adc8e80318
+COMMIT=99f79c018893f5a06e63a766f5c4a207c5368a1e
 include $(TOPDIR)/rules.mk
 PKG_NAME:=rascal
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_VERSION:=$(COMMIT)
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)
-PKG_SOURCE_URL:=https://$(GIT_USERNAME):$(GIT_AUTH_TOKEN)@github.com/cucumber-tony/rascal.git
+PKG_SOURCE_URL:=https://github.com/cucumber-tony/rascal.git
 PKG_SOURCE:=$(PKG_NAME).tar.gz
 PKG_VERSION:=1#$(COMMIT)
 #PKG_RELEASE:=1
@@ -43,7 +43,7 @@ $(CP) $(PKG_BUILD_DIR)/rascal $(1)/usr/bin/rascal
 
 endef
 
-$(eval $(call BuildPackage,rascal))
+	$(eval $(call BuildPackage,rascal))
 
 .PHONY: clean
 	clean:
