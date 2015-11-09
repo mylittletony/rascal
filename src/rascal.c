@@ -114,14 +114,16 @@ void send_data(json_object *data);
 static uint8_t insecure = 0;
 static uint8_t verbose = 0;
 int mac_array = 30; // Number of macs
-int timer = 200; // About 60 seconds still to figure the counter.
+int timer = 60; // About 60 seconds still to figure the counter.
+static uint8_t deltaforce = 0;
 char *config_file = NULL;
 char post_url[255];
 char if_name[10];
 char ap_mac[19];
 double lng;
 double lat;
-clock_t c0;
+/* clock_t c0 = 0; */
+time_t start = 0;
 
 static const struct radiotap_align_size align_size_000000_00[] = {
   [0] = { .align = 1, .size = 4, },
@@ -138,7 +140,6 @@ typedef struct {
   u_int8_t        flags;
   u_int8_t        rate;
   int8_t          ant_sig;
-  int8_t          ant_noise;
   int8_t          lock_quality;
   u_int8_t        ant;
 
@@ -156,7 +157,10 @@ typedef struct {
 
 void print_mac(FILE * stream,u_char * mac);
 void format_mac(u_char * mac, char * f);
-int array_contains(char *array, char *ip );
+void updateRssi(int8_t new_rssi, int8_t prev_rssi, char * key, json_object * json, time_t t0, time_t last_seen);
+void updateDelta(int8_t new_rssi, int8_t prev_rssi, json_object * jsonObj);
+
+int array_contains(char * array, char * ip );
 
 struct json_object *obj1, *obj2, *array, *tmp1, *tmp2;
 
@@ -164,12 +168,9 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
 
   static int count = 1;
   int diff;
-  clock_t c1;
-
-  if (c0 == 0) 
-    c0 = clock();
-
-  c1 = clock();
+  if (start == 0) {
+    start = time(0);
+  }
 
   time_t t0 = time(0);
   int err, i, arraylen, radiotap_header_len;
@@ -192,17 +193,13 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
 
   radiotap_header_len = iter._max_length;
 
-  /* if (verbose) { */
-  /*   /1* printf("header length: %d\n", radiotap_header_len); *1/ */
-  /* }; */
-
   while (!(err = ieee80211_radiotap_iterator_next(&iter))) {
     if (iter.this_arg_index == IEEE80211_RADIOTAP_DBM_ANTSIGNAL) {
       rssi = (int8_t)iter.this_arg[0];
-      /* if (verbose) { */
-      /*   printf("antsignal is: %d\n", rssi); */
-      /* } */
     }
+    /* if (iter.this_arg_index == IEEE80211_RADIOTAP_DBM_ANTNOISE) { */
+    /*   noise = (int8_t)iter.this_arg[0]; */
+    /* } */
   };
 
   if (header->len >= 24 && verbose) {
@@ -248,47 +245,66 @@ void pcap_callback(u_char *args, const struct pcap_pkthdr *header, const u_char 
       tmp1 = json_object_array_get_idx(array, i);
       json_object_object_get_ex(tmp1, "client_mac", &tmp2);
 
-      int result = strcmp(json_object_get_string(tmp2), client_mac);
-
-      if ( result == 0 ) {
-
-        json_object_object_foreach(tmp1, key, val) {
-          if (strcmp(key, "last_seen") == 0) {
-            json_object_object_add(tmp1, key, json_object_new_int(t0));
-          } else if (strcmp(key, "last_seen") == 0) {
-            if ( val == 0 && rssi != 0) {
-              json_object_object_add(tmp1, key, json_object_new_int(rssi));
-            }
-          }
-          /* break; */
+      /* if ( strcmp(json_object_get_string(tmp2), client_mac) == 0 ) { */
+      json_object_object_foreach(tmp1, key, val) {
+        time_t last_seen;
+        if (strcmp(key, "last_seen") == 0) {
+          json_object_object_add(tmp1, key, json_object_new_int(t0));
+          last_seen = json_object_get_int(val);
         }
-        /* break; */
+        if ( deltaforce ) {
+          if (strcmp(key, "rssi") == 0) {
+            int8_t prev_rssi;
+            prev_rssi =  json_object_get_int(val);
+            updateRssi(rssi, prev_rssi, key, tmp1, t0, last_seen);
+          }
+        }
       }
+      /* } */
     }
   }
 
   count++;
-  diff = 1000 * (c1 - c0) / CLOCKS_PER_SEC;
+  diff = (t0 - start);
 
   if (verbose) {
     printf("Packet number: %d\n", count);
-    printf ("Elapsed CPU time: %d\n", diff);
+    printf("Time difference is: %d\n", diff);
   }
 
   if (verbose)
     printf("macs: %d, timer: %d\n", mac_array, timer);
 
-  if ((arraylen >= mac_array && diff > timer) || (arraylen > 0 && diff >= 5000)) {
+  if ((arraylen >= mac_array && diff > timer) || (arraylen > 0 && diff >= 60)) {
     memset(buf, 0, sizeof buf);
     if (verbose)
       printf ("The json object created: %s\n",json_object_to_json_string(array));
     send_data(array);
     json_object_put(array);
-    c0 = 0;
+    start = time(0);
     count = 1;
   };
 
   return;
+}
+
+void updateRssi( int8_t new_rssi, int8_t prev_rssi, char * key, json_object * jsonObj, time_t t0, time_t last_seen ) {
+  if ( new_rssi != 0 && ( abs(new_rssi) < abs(prev_rssi)) ) {
+    json_object_object_add(jsonObj, key, json_object_new_int(new_rssi));
+  }
+  if ( ( t0 - last_seen ) > 5 ) {
+    updateDelta(new_rssi, prev_rssi, jsonObj);
+  }
+}
+
+void updateDelta(int8_t new_rssi, int8_t prev_rssi, json_object * jsonObj) {
+  int8_t delta;
+  delta = ( prev_rssi - new_rssi );
+  json_object_object_add(jsonObj, "delta", json_object_new_int(delta));
+  if(verbose)
+  {
+    printf("Difference is %hhd\n");
+  }
 }
 
 void format_mac(u_char * mac, char * f) {
@@ -440,7 +456,7 @@ void send_data(json_object *array) {
     if (verbose) {
       printf ("Sending this: %s\n",json_object_to_json_string(obj1));
     }
-      
+
     openlog(SYSLOG_NAME, LOG_PID|LOG_CONS, LOG_USER);
     res = curl_easy_perform(curl);
     if(res != CURLE_OK) {
@@ -580,7 +596,7 @@ int main(int argc, char *argv[]) {
   int  c;
   opterr = 0;
 
-  while ((c = getopt(argc, argv, "i:m:c:t:a:t:vk")) != -1) {
+  while ((c = getopt(argc, argv, "i:m:c:t:a:t:vkd")) != -1) {
     switch(c) {
       case 'i':
         strcpy(if_name, optarg);
@@ -599,6 +615,9 @@ int main(int argc, char *argv[]) {
         break;
       case 't':
         timer = atoi(optarg);
+        break;
+      case 'd':
+        deltaforce = 1;
         break;
       case 'a':
         mac_array = atoi(optarg);
