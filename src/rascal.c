@@ -53,7 +53,7 @@
 #include "radiotap.h"
 #include "radiotap_iter.h"
 #include <arpa/inet.h>
-#include <json/json.h>
+#include <json-c/json.h>
 #include <time.h>
 #include <curl/curl.h>
 
